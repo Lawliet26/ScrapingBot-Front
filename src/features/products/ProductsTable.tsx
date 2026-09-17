@@ -40,7 +40,9 @@ export function ProductsTable({ products, visibleFields, onEdit, onDelete }: Pro
               </td>
               <td className="max-w-xs px-4 py-3">
                 <div className="flex items-start gap-2">
-                  <p className="whitespace-pre-line text-ink-muted">{product.descripcion || '—'}</p>
+                  <p className="line-clamp-3 whitespace-pre-line text-ink-muted" title={product.descripcion || undefined}>
+                    {product.descripcion || '—'}
+                  </p>
                   <FieldVisibilityBadge field="descripcion" visibleFields={visibleFields} />
                 </div>
               </td>
