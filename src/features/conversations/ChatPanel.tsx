@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch'
 import { Composer } from './Composer'
 import { MessageBubble } from './MessageBubble'
 import { NotesPanel } from './NotesPanel'
-import { mergeMessages } from './mergeMessages'
+import { mergeById } from './mergeById'
 import { useConversationDetailQuery, useConversationPoll, useMarkRead, useSendMessage, useToggleBot } from './hooks'
 import type { SendMessagePayload } from '@/api/conversations'
 
@@ -52,8 +52,8 @@ export function ChatPanel({ conversationId, customerName, phone, onBack }: ChatP
   useEffect(() => {
     if (!pollQuery.data) return
     const incomingMessages = pollQuery.data.messages ?? []
-    setMessages((prev) => mergeMessages(prev, incomingMessages))
-    setNotes(pollQuery.data.notes ?? [])
+    setMessages((prev) => mergeById(prev, incomingMessages))
+    setNotes((prev) => mergeById(prev, pollQuery.data.notes ?? []))
     setConvState(pollQuery.data.conversation ?? null)
     setIdleWarning(pollQuery.data.idle_warning ?? false)
     const last = incomingMessages.at(-1)?.created_at
