@@ -4,7 +4,9 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { formatDateDDMMHHmm } from '@/lib/format'
 
 export function NotesPanel({ notes }: { notes: ConversationNote[] }) {
-  const sorted = [...notes].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const sorted = [...(notes ?? [])].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )
 
   return (
     <div className="flex h-full w-72 shrink-0 flex-col border-l border-border bg-surface">

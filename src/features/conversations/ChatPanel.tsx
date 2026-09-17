@@ -40,21 +40,23 @@ export function ChatPanel({ conversationId, customerName, phone, onBack }: ChatP
 
   useEffect(() => {
     if (!detailQuery.data) return
-    setMessages(detailQuery.data.messages)
-    setNotes(detailQuery.data.notes)
-    setConvState(detailQuery.data.conversation)
-    setIdleWarning(detailQuery.data.idle_warning)
-    sinceRef.current = detailQuery.data.messages.at(-1)?.created_at ?? null
+    const incomingMessages = detailQuery.data.messages ?? []
+    setMessages(incomingMessages)
+    setNotes(detailQuery.data.notes ?? [])
+    setConvState(detailQuery.data.conversation ?? null)
+    setIdleWarning(detailQuery.data.idle_warning ?? false)
+    sinceRef.current = incomingMessages.at(-1)?.created_at ?? null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detailQuery.data])
 
   useEffect(() => {
     if (!pollQuery.data) return
-    setMessages((prev) => mergeMessages(prev, pollQuery.data.messages))
-    setNotes(pollQuery.data.notes)
-    setConvState(pollQuery.data.conversation)
-    setIdleWarning(pollQuery.data.idle_warning)
-    const last = pollQuery.data.messages.at(-1)?.created_at
+    const incomingMessages = pollQuery.data.messages ?? []
+    setMessages((prev) => mergeMessages(prev, incomingMessages))
+    setNotes(pollQuery.data.notes ?? [])
+    setConvState(pollQuery.data.conversation ?? null)
+    setIdleWarning(pollQuery.data.idle_warning ?? false)
+    const last = incomingMessages.at(-1)?.created_at
     if (last) sinceRef.current = last
   }, [pollQuery.data])
 
