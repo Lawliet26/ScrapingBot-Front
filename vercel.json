@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://productos.luisacoy.me/api/:path*" },
+    { "source": "/api/(.*)", "destination": "https://productos.luisacoy.me/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
