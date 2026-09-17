@@ -7,7 +7,7 @@ export function MessageBubble({ message }: { message: Message }) {
   const isOutbound = message.direction === 'outbound'
 
   return (
-    <div className={cn('flex flex-col', isOutbound ? 'items-end' : 'items-start')}>
+    <div className={cn('flex flex-col motion-safe:animate-in', isOutbound ? 'items-end' : 'items-start')}>
       <span className="mb-1 px-1 text-[11px] font-medium text-ink-faint">{isOutbound ? 'Bot' : 'Cliente'}</span>
       <div
         className={cn(
