@@ -30,6 +30,8 @@ export function LoginPage() {
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError('Usuario o contraseña incorrectos.')
+      } else if (err instanceof ApiError) {
+        setError(err.detail ?? err.nonFieldMessages[0] ?? err.message)
       } else {
         setError('No pudimos conectar con el servidor. Intentá de nuevo.')
       }
