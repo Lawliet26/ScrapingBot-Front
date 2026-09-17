@@ -13,6 +13,11 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useAgentPromptQuery, useUpdateAgentPrompt } from './hooks'
 
+const PROVIDER_LABELS: Record<AgentProvider, string> = {
+  gemini: 'Gemini',
+  openai: 'OpenAI (ChatGPT)',
+}
+
 export function AgentPromptPage() {
   const promptQuery = useAgentPromptQuery()
   const updatePrompt = useUpdateAgentPrompt()
@@ -109,9 +114,16 @@ export function AgentPromptPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label>Proveedor de IA</Label>
-            <Select value={provider} onValueChange={(v) => setProvider(v as AgentProvider)}>
+            <Select
+              value={provider}
+              onValueChange={(v) => {
+                // Radix dispara un onValueChange("") espurio en el montaje (su <select>
+                // nativo oculto para autofill); un valor real siempre es 'gemini' u 'openai'.
+                if (v) setProvider(v as AgentProvider)
+              }}
+            >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue>{PROVIDER_LABELS[provider]}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="gemini">Gemini</SelectItem>
