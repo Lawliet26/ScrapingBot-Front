@@ -1,7 +1,8 @@
-import { ChatCircleDots, Package, SignOut, Sparkle } from '@phosphor-icons/react'
+import { ChatCircleDots, Monitor, Moon, Package, SignOut, Sparkle, Sun } from '@phosphor-icons/react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthProvider'
 import { Avatar } from '@/components/ui/avatar'
+import { useTheme, type ThemeMode } from '@/theme/ThemeProvider'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
@@ -10,11 +11,20 @@ const NAV_ITEMS = [
   { to: '/agente', label: 'Prompt del agente', icon: Sparkle },
 ]
 
+const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: typeof Sun }[] = [
+  { mode: 'light', label: 'Claro', icon: Sun },
+  { mode: 'system', label: 'Estándar', icon: Monitor },
+  { mode: 'dark', label: 'Oscuro', icon: Moon },
+]
+
 const ROW_HEIGHT = 40
 const ROW_GAP = 4
 
+const EASE = 'duration-[260ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
+
 const REVEAL = cn(
-  'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity] duration-200',
+  'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity]',
+  EASE,
   'group-hover/sidebar:max-w-[160px] group-hover/sidebar:opacity-100',
   'group-focus-within/sidebar:max-w-[160px] group-focus-within/sidebar:opacity-100',
   'motion-reduce:transition-none',
@@ -22,6 +32,7 @@ const REVEAL = cn(
 
 export function AppShell() {
   const { user, logout } = useAuth()
+  const { mode, setMode } = useTheme()
   const location = useLocation()
 
   const activeIndex = NAV_ITEMS.findIndex((item) => location.pathname.startsWith(item.to))
@@ -32,13 +43,21 @@ export function AppShell() {
         <aside
           className={cn(
             'absolute inset-y-0 left-0 z-20 flex w-16 flex-col overflow-hidden border-r border-border bg-surface',
-            'transition-[width,box-shadow] duration-200 ease-out motion-reduce:transition-none',
+            'transition-[width,box-shadow]',
+            EASE,
+            'motion-reduce:transition-none',
             'group-hover/sidebar:w-60 group-hover/sidebar:shadow-xl',
             'group-focus-within/sidebar:w-60 group-focus-within/sidebar:shadow-xl',
           )}
         >
           <div className="flex h-14 items-center gap-2 px-4">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-ink transition-transform duration-300 group-hover/sidebar:rotate-[12deg] motion-reduce:transition-none">
+            <div
+              className={cn(
+                'flex size-7 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-ink transition-transform',
+                EASE,
+                'group-hover/sidebar:rotate-[12deg] motion-reduce:transition-none',
+              )}
+            >
               <ChatCircleDots size={16} weight="fill" />
             </div>
             <span className={cn(REVEAL, 'text-[15px] font-semibold text-ink')}>Dropi Bot</span>
@@ -47,7 +66,7 @@ export function AppShell() {
           <nav className="relative flex flex-1 flex-col gap-1 px-3 py-2">
             <div
               aria-hidden
-              className="absolute inset-x-3 top-2 h-10 rounded-lg bg-accent-soft transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none"
+              className={cn('absolute inset-x-3 top-2 h-10 rounded-lg bg-accent-soft transition-[transform,opacity]', EASE, 'motion-reduce:transition-none')}
               style={{
                 transform: `translateY(${activeIndex >= 0 ? activeIndex * (ROW_HEIGHT + ROW_GAP) : 0}px)`,
                 opacity: activeIndex >= 0 ? 1 : 0,
@@ -70,6 +89,24 @@ export function AppShell() {
               )
             })}
           </nav>
+
+          <div className={cn(REVEAL, 'mx-3 mb-1 flex items-center gap-1 rounded-lg bg-canvas p-1')}>
+            {THEME_OPTIONS.map(({ mode: optionMode, label, icon: OptionIcon }) => (
+              <button
+                key={optionMode}
+                type="button"
+                onClick={() => setMode(optionMode)}
+                title={label}
+                aria-pressed={mode === optionMode}
+                className={cn(
+                  'flex h-7 flex-1 items-center justify-center rounded-md transition-colors',
+                  mode === optionMode ? 'bg-surface text-accent-strong shadow-sm' : 'text-ink-faint hover:text-ink',
+                )}
+              >
+                <OptionIcon size={14} weight={mode === optionMode ? 'fill' : 'regular'} />
+              </button>
+            ))}
+          </div>
 
           <div className="flex items-center gap-2.5 border-t border-border px-4 py-3">
             <Avatar name={user?.username ?? '?'} />
