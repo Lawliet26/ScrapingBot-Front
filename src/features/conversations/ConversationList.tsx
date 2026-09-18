@@ -32,7 +32,7 @@ export function ConversationList({
     : []
 
   return (
-    <div className="flex h-full w-80 shrink-0 flex-col border-r border-border bg-surface">
+    <div className="flex h-full w-full shrink-0 flex-col border-r border-border bg-surface lg:w-80">
       <div className="border-b border-border p-3">
         <div className="relative">
           <MagnifyingGlass size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />

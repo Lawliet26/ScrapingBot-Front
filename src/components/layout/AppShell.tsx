@@ -32,6 +32,11 @@ function revealClass(expanded: boolean) {
   )
 }
 
+function nextThemeMode(current: ThemeMode): ThemeMode {
+  const index = THEME_OPTIONS.findIndex((option) => option.mode === current)
+  return THEME_OPTIONS[(index + 1) % THEME_OPTIONS.length].mode
+}
+
 export function AppShell() {
   const { user, logout } = useAuth()
   const { mode, setMode } = useTheme()
@@ -39,10 +44,57 @@ export function AppShell() {
   const [expanded, setExpanded] = useState(false)
 
   const activeIndex = NAV_ITEMS.findIndex((item) => location.pathname.startsWith(item.to))
+  const CurrentThemeIcon = THEME_OPTIONS.find((option) => option.mode === mode)?.icon ?? Monitor
 
   return (
-    <div className="flex min-h-[100dvh] bg-canvas">
-      <div className="group/sidebar relative w-16 shrink-0">
+    <div className="min-h-[100dvh] bg-canvas lg:flex">
+      {/* Barra superior mobile */}
+      <div className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface px-4 lg:hidden">
+        <div className="flex items-center gap-2">
+          <div className="flex size-7 items-center justify-center rounded-lg bg-accent text-accent-ink">
+            <ChatCircleDots size={16} weight="fill" />
+          </div>
+          <span className="text-[15px] font-semibold text-ink">Dropi Bot</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setMode(nextThemeMode(mode))}
+            className="flex size-9 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-canvas hover:text-ink"
+            title="Cambiar tema"
+          >
+            <CurrentThemeIcon size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={() => void logout()}
+            className="flex size-9 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-canvas hover:text-danger"
+            title="Cerrar sesión"
+          >
+            <SignOut size={18} />
+          </button>
+        </div>
+      </div>
+
+      {/* Barra inferior mobile */}
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex h-16 items-stretch border-t border-border bg-surface lg:hidden">
+        {NAV_ITEMS.map(({ to, label, icon: ItemIcon }, index) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={cn(
+              'flex flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium',
+              index === activeIndex ? 'text-accent-strong' : 'text-ink-faint',
+            )}
+          >
+            <ItemIcon size={20} weight={index === activeIndex ? 'fill' : 'regular'} />
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* Sidebar desktop: rail que se expande al pasar el mouse */}
+      <div className="group/sidebar relative hidden w-16 shrink-0 lg:block">
         <aside
           onMouseEnter={() => setExpanded(true)}
           onMouseLeave={() => setExpanded(false)}
@@ -137,7 +189,7 @@ export function AppShell() {
         </aside>
       </div>
 
-      <main className="min-w-0 flex-1">
+      <main className="h-[100dvh] min-w-0 overflow-y-auto pt-14 pb-16 lg:flex-1 lg:pt-0 lg:pb-0">
         <Outlet />
       </main>
     </div>

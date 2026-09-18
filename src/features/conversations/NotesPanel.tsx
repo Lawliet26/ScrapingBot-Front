@@ -9,7 +9,7 @@ export function NotesPanel({ notes }: { notes: ConversationNote[] }) {
   )
 
   return (
-    <div className="flex h-full w-72 shrink-0 flex-col border-l border-border bg-surface">
+    <div className="hidden h-full w-72 shrink-0 flex-col border-l border-border bg-surface xl:flex">
       <div className="flex h-14 items-center border-b border-border px-4">
         <h2 className="text-sm font-semibold text-ink">Notas IA</h2>
       </div>

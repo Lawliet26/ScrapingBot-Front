@@ -17,8 +17,8 @@ function FieldVisibilityBadge({ field, visibleFields }: { field: AgentVisibleFie
 
 export function ProductsTable({ products, visibleFields, onEdit, onDelete }: ProductsTableProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-surface">
-      <table className="w-full text-left text-sm">
+    <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+      <table className="w-full min-w-[820px] text-left text-sm">
         <thead>
           <tr className="border-b border-border text-[12px] uppercase tracking-wide text-ink-faint">
             <th className="px-4 py-3 font-medium">Nombre</th>
