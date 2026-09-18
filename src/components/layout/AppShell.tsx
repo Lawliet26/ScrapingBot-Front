@@ -27,7 +27,6 @@ const REVEAL = cn(
   EASE,
   'group-hover/sidebar:max-w-[160px] group-hover/sidebar:opacity-100',
   'group-focus-within/sidebar:max-w-[160px] group-focus-within/sidebar:opacity-100',
-  'motion-reduce:transition-none',
 )
 
 export function AppShell() {
@@ -46,7 +45,6 @@ export function AppShell() {
             'shadow-[8px_0_24px_-8px_rgba(0,0,0,0)]',
             'transition-[width,box-shadow]',
             EASE,
-            'motion-reduce:transition-none',
             'group-hover/sidebar:w-60 group-hover/sidebar:shadow-[8px_0_24px_-8px_rgba(0,0,0,0.35)]',
             'group-focus-within/sidebar:w-60 group-focus-within/sidebar:shadow-[8px_0_24px_-8px_rgba(0,0,0,0.35)]',
           )}
@@ -67,7 +65,7 @@ export function AppShell() {
           <nav className="relative flex flex-1 flex-col gap-1 px-3 py-2">
             <div
               aria-hidden
-              className={cn('absolute inset-x-3 top-2 h-10 rounded-lg bg-accent-soft transition-[transform,opacity]', EASE, 'motion-reduce:transition-none')}
+              className={cn('absolute inset-x-3 top-2 h-10 rounded-lg bg-accent-soft transition-[transform,opacity]', EASE)}
               style={{
                 transform: `translateY(${activeIndex >= 0 ? activeIndex * (ROW_HEIGHT + ROW_GAP) : 0}px)`,
                 opacity: activeIndex >= 0 ? 1 : 0,
