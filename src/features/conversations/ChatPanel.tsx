@@ -10,6 +10,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 import { Composer } from './Composer'
 import { MessageBubble } from './MessageBubble'
+import { NotesDialog } from './NotesDialog'
 import { NotesPanel } from './NotesPanel'
 import { mergeById } from './mergeById'
 import { useConversationDetailQuery, useConversationPoll, useMarkRead, useSendMessage, useToggleBot } from './hooks'
@@ -126,6 +127,8 @@ export function ChatPanel({ conversationId, customerName, phone, onBack }: ChatP
             <p className="truncate text-sm font-medium text-ink">{customerName}</p>
             <p className="truncate text-[12px] text-ink-faint">{phone}</p>
           </div>
+          <NotesDialog notes={notes} />
+
           <div className="flex items-center gap-2">
             <span className="text-[13px] font-medium text-ink-muted">Bot {convState.llm_enabled ? 'ON' : 'OFF'}</span>
             <Switch
