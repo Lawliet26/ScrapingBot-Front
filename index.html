@@ -7,12 +7,14 @@
     <title>Panel Dropi Bot</title>
     <script>
       (function () {
+        var mode = 'standard';
         try {
           var stored = localStorage.getItem('theme');
-          if (stored === 'light' || stored === 'dark') {
-            document.documentElement.setAttribute('data-theme', stored);
+          if (stored === 'light' || stored === 'standard' || stored === 'dark') {
+            mode = stored;
           }
         } catch (e) {}
+        document.documentElement.setAttribute('data-theme', mode);
       })();
     </script>
   </head>

@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 
-export type ThemeMode = 'light' | 'system' | 'dark'
+export type ThemeMode = 'light' | 'standard' | 'dark'
 
 const STORAGE_KEY = 'theme'
+const DEFAULT_MODE: ThemeMode = 'standard'
 
 interface ThemeContextValue {
   mode: ThemeMode
@@ -14,20 +15,15 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 function readStoredMode(): ThemeMode {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'light' || stored === 'dark') return stored
+    if (stored === 'light' || stored === 'standard' || stored === 'dark') return stored
   } catch {
     // localStorage puede no estar disponible (modo privado)
   }
-  return 'system'
+  return DEFAULT_MODE
 }
 
 function applyMode(mode: ThemeMode) {
-  const root = document.documentElement
-  if (mode === 'system') {
-    root.removeAttribute('data-theme')
-  } else {
-    root.setAttribute('data-theme', mode)
-  }
+  document.documentElement.setAttribute('data-theme', mode)
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -40,11 +36,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   function setMode(next: ThemeMode) {
     setModeState(next)
     try {
-      if (next === 'system') {
-        localStorage.removeItem(STORAGE_KEY)
-      } else {
-        localStorage.setItem(STORAGE_KEY, next)
-      }
+      localStorage.setItem(STORAGE_KEY, next)
     } catch {
       // no es crítico si no se puede persistir
     }
