@@ -20,7 +20,7 @@ const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: typeof Sun }[] = [
 const ROW_HEIGHT = 40
 const ROW_GAP = 4
 
-const EASE = 'duration-[260ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
+const EASE = 'duration-[320ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
 
 const REVEAL = cn(
   'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity]',
@@ -43,11 +43,12 @@ export function AppShell() {
         <aside
           className={cn(
             'absolute inset-y-0 left-0 z-20 flex w-16 flex-col overflow-hidden border-r border-border bg-surface',
+            'shadow-[8px_0_24px_-8px_rgba(0,0,0,0)]',
             'transition-[width,box-shadow]',
             EASE,
             'motion-reduce:transition-none',
-            'group-hover/sidebar:w-60 group-hover/sidebar:shadow-xl',
-            'group-focus-within/sidebar:w-60 group-focus-within/sidebar:shadow-xl',
+            'group-hover/sidebar:w-60 group-hover/sidebar:shadow-[8px_0_24px_-8px_rgba(0,0,0,0.35)]',
+            'group-focus-within/sidebar:w-60 group-focus-within/sidebar:shadow-[8px_0_24px_-8px_rgba(0,0,0,0.35)]',
           )}
         >
           <div className="flex h-14 items-center gap-2 px-4">
