@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthProvider'
 import { Avatar } from '@/components/ui/avatar'
+import { useConversationListSync } from '@/features/conversations/useConversationListSync'
 import { useTheme, type ThemeMode } from '@/theme/ThemeProvider'
 import { cn } from '@/lib/utils'
 
@@ -42,6 +43,8 @@ export function AppShell() {
   const { mode, setMode } = useTheme()
   const location = useLocation()
   const [expanded, setExpanded] = useState(false)
+
+  useConversationListSync()
 
   const activeIndex = NAV_ITEMS.findIndex((item) => location.pathname.startsWith(item.to))
   const CurrentThemeIcon = THEME_OPTIONS.find((option) => option.mode === mode)?.icon ?? Monitor

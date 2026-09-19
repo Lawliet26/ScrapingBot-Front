@@ -15,6 +15,7 @@ import { NotesPanel } from './NotesPanel'
 import { mergeById } from './mergeById'
 import { useConversationDetailQuery, useConversationPoll, useMarkRead, useSendMessage, useToggleBot } from './hooks'
 import type { SendMessagePayload } from '@/api/conversations'
+import { useWebSocket } from '@/realtime/WebSocketProvider'
 
 interface ChatPanelProps {
   conversationId: string
@@ -60,6 +61,25 @@ export function ChatPanel({ conversationId, customerName, phone, onBack }: ChatP
     const last = incomingMessages.at(-1)?.created_at
     if (last) sinceRef.current = last
   }, [pollQuery.data])
+
+  const { subscribe, on } = useWebSocket()
+
+  useEffect(() => {
+    const offSub = subscribe(conversationId)
+    const offMsg = on('message.created', (event) => {
+      if (event.conversation_id !== conversationId) return
+      setMessages((prev) => mergeById(prev, [event.data]))
+    })
+    const offNote = on('note.created', (event) => {
+      if (event.conversation_id !== conversationId) return
+      setNotes((prev) => mergeById(prev, [event.data]))
+    })
+    return () => {
+      offMsg()
+      offNote()
+      offSub()
+    }
+  }, [conversationId, subscribe, on])
 
   useEffect(() => {
     if (detailQuery.data && markedReadRef.current !== conversationId) {

@@ -52,14 +52,14 @@ Chain strategy: feature-branch-chain
 
 ## Phase 3: Work Unit 3 — WebSocketProvider (PR#2, base = PR#1 branch)
 
-- [ ] 3.1 Create `src/realtime/WebSocketProvider.tsx`: context + `useWebSocket()` (throws outside provider, matching `AuthProvider`/`useAuth()`); `subscribe`/`on` built once via refs + `useMemo`, identity-stable across `status` re-renders.
-- [ ] 3.2 Add lifecycle effect gated on `status === 'authenticated' && isStaff` (`useAuth()`): create the manager, `connect()`, cleanup calls `disconnect()`.
-- [ ] 3.3 Wire `onTerminal`: `4401` → toast + `queryClient.setQueryData(['auth','me'], null)`; `4403` → toast + `queryClient.invalidateQueries({queryKey:['auth','me']})`. AC: never calls `queryClient.clear()`.
-- [ ] 3.4 Mount `<WebSocketProvider>` as an inline layout route element in `src/App.tsx`, below `RequireStaff` and above `AppShell` (D10, ~2-line diff, no new wrapper file).
+- [x] 3.1 Create `src/realtime/WebSocketProvider.tsx`: context + `useWebSocket()` (throws outside provider, matching `AuthProvider`/`useAuth()`); `subscribe`/`on` built once via refs + `useMemo`, identity-stable across `status` re-renders.
+- [x] 3.2 Add lifecycle effect gated on `status === 'authenticated' && isStaff` (`useAuth()`): create the manager, `connect()`, cleanup calls `disconnect()`.
+- [x] 3.3 Wire `onTerminal`: `4401` → toast + `queryClient.setQueryData(['auth','me'], null)`; `4403` → toast + `queryClient.invalidateQueries({queryKey:['auth','me']})`. AC: never calls `queryClient.clear()`.
+- [x] 3.4 Mount `<WebSocketProvider>` as an inline layout route element in `src/App.tsx`, below `RequireStaff` and above `AppShell` (D10, ~2-line diff, no new wrapper file).
 
 ## Phase 4: Work Unit 4 — ChatPanel + sidebar wiring (PR#2)
 
-- [ ] 4.1 Create `src/features/conversations/useConversationListSync.ts`: `setQueriesData` on the `['conversations','list']` prefix, update-only-if-row-present via `mergeById`, never insert. AC: entries without the row are untouched; entries with it are replaced across every `search` variant.
-- [ ] 4.2 Call `useConversationListSync()` from `src/components/layout/AppShell.tsx` (D8 — not from the provider).
-- [ ] 4.3 Add a subscribe effect to `src/features/conversations/ChatPanel.tsx` after the existing poll effect: `subscribe(conversationId)`, `on('message.created', ...)` → `mergeById` into messages, `on('note.created', ...)` → `mergeById` into notes; cleanup unsubscribes/offs in reverse order. AC: no `sinceRef` write (D6); events for other `conversation_id`s are ignored.
+- [x] 4.1 Create `src/features/conversations/useConversationListSync.ts`: `setQueriesData` on the `['conversations','list']` prefix, update-only-if-row-present via `mergeById`, never insert. AC: entries without the row are untouched; entries with it are replaced across every `search` variant.
+- [x] 4.2 Call `useConversationListSync()` from `src/components/layout/AppShell.tsx` (D8 — not from the provider).
+- [x] 4.3 Add a subscribe effect to `src/features/conversations/ChatPanel.tsx` after the existing poll effect: `subscribe(conversationId)`, `on('message.created', ...)` → `mergeById` into messages, `on('note.created', ...)` → `mergeById` into notes; cleanup unsubscribes/offs in reverse order. AC: no `sinceRef` write (D6); events for other `conversation_id`s are ignored.
 - [ ] 4.4 Manual verification: two browsers, message appears <1s; kill network → reconnects; block socket entirely → 8s/15s polls still update with no error UI (Requirement: Polling Independence).
