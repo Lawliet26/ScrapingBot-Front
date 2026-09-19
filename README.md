@@ -43,6 +43,26 @@ VITE_API_PROXY=http://localhost:8000
 una petición cross-origin y las cookies de sesión (`sessionid`, `csrftoken`) funcionan igual que en
 producción.
 
+### Chat en tiempo real (WebSocket)
+
+El panel abre un único WebSocket app-wide (`wss://agente.luisacoy.me/ws/chat/` en producción) para
+recibir mensajes y notas nuevas sin esperar al polling. Es puramente aditivo: si el socket no
+conecta o se cae, el poll de 8s (detalle) y 15s (lista) siguen funcionando exactamente igual —
+el socket solo reduce la latencia percibida.
+
+Variable de entorno opcional: `VITE_WS_URL`, con la URL absoluta completa (protocolo + host +
+path). Si no se define, se deriva del origen actual: `ws(s)://<host>/ws/chat/`.
+
+- **Producción / preview**: no hace falta configurarla — mismo dominio, mismo origen.
+- **Desarrollo local con `VITE_API_PROXY` configurado**: tampoco hace falta. `vite.config.ts`
+  agrega una entrada de proxy `/ws` (con `ws: true`) espejo de `/api`, así que el socket sale por
+  `ws://localhost:5173/ws/chat/` y llega al backend como si fuera same-origin.
+- **Desarrollo local sin proxy**, apuntando directo al backend desplegado: seteá
+  `VITE_WS_URL=wss://agente.luisacoy.me/ws/chat/` en tu `.env`.
+
+`import.meta.env.VITE_WS_URL` se inlinea en build time — cambiarla requiere un redeploy, no solo
+un cambio de variable en runtime.
+
 ## Autenticación
 
 Sesión Django + cookie CSRF (sin JWT, sin tokens en `localStorage`):
@@ -60,6 +80,7 @@ Sesión Django + cookie CSRF (sin JWT, sin tokens en `localStorage`):
 src/
   api/          # cliente fetch (CSRF, multipart, envelope de errores) + endpoints tipados
   auth/         # AuthProvider, guard de rutas, login
+  realtime/     # conexión WebSocket (reconexión, backoff, suscripciones) — ver arriba
   components/
     layout/     # shell con sidebar de navegación
     ui/         # primitivos (botón, input, dialog, badge, etc.)

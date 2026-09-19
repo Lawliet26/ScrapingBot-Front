@@ -22,6 +22,15 @@ export default defineConfig(({ mode }) => {
               target: apiProxyTarget,
               changeOrigin: true,
             },
+            '/ws': {
+              target: apiProxyTarget,
+              ws: true,
+              changeOrigin: true,
+              configure: (proxy) => {
+                // changeOrigin rewrites Host, not Origin; Channels' origin validator reads Origin.
+                proxy.on('proxyReqWs', (proxyReq) => proxyReq.setHeader('origin', apiProxyTarget))
+              },
+            },
           }
         : undefined,
     },
