@@ -72,8 +72,10 @@ When the server responds to a subscribe with an error frame (`invalid_conversati
 
 #### Scenario: Server rejects an unknown conversation
 - GIVEN a subscribe is sent for a nonexistent `conversation_id`
-- WHEN the server replies `{"type":"error","error":"conversation_not_found"}`
+- WHEN the server replies `{"type":"error","error":"conversation_not_found","conversation_id":"<id>"}`
 - THEN the id is not marked subscribed and is not resent after a future reconnect
+
+Backend confirmed and deployed (2026-09-19): `invalid_conversation_id` and `conversation_not_found` echo `conversation_id`; `invalid_json`, `unknown_type`, and `missing_conversation_id` do not (no id is parseable/available in those cases). Implemented in `connectionManager.ts`: on a rejection error carrying `conversation_id`, the id is deleted from the subscription map outright (not merely decremented), so it is never resent after a reconnect regardless of local ref count.
 
 ### Requirement: Message Event Consumption
 
@@ -139,6 +141,4 @@ Resolved during design/implementation:
 3. **Close code `1000`**: accepted design decision, not a gap. The handoff doc calls a server-sent `1000` a backend config issue, but this spec's binary 4401/4403-only terminal rule (Close Code Classification) makes it retryable by design — a clean server close (e.g. a daphne redeploy) should reconnect, not give up. Documented, accepted operational tradeoff.
 4. **Malformed pushed-event payload**: resolved. `connectionManager.ts`'s `onmessage` handler never throws — malformed JSON or an unrecognized `type` triggers a dev-only `console.warn` and is swallowed, with no `ChatEvent` emitted. Covered by a dedicated test.
 
-**Still open, not resolved by this change**:
-
-5. **Invalid Conversation Rejection has no implementable protocol path.** The documented server error frame (`{"type":"error","error":"conversation_not_found"}`) carries no `conversation_id`, so the client cannot correlate a rejection to a specific pending subscribe. Both PRs correctly left this unattempted rather than inventing a client-side heuristic. Pending backend confirmation on whether the frame actually includes `conversation_id` in practice (message sent to backend team 2026-09-19) — resolve via a follow-up change once confirmed.
+5. **Invalid Conversation Rejection**: resolved 2026-09-19. Backend confirmed the original handoff doc was accurate (the error frame did NOT carry `conversation_id`) and shipped a fix: `invalid_conversation_id`/`conversation_not_found` now echo `conversation_id`. Frontend implemented the correlation in `connectionManager.ts` (branch `fix/chat-websocket-invalid-conversation-rejection`, stacked on PR#2) with dedicated unit tests. All 12 requirements in this spec are now satisfied.

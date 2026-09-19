@@ -37,6 +37,10 @@ export interface ConnectionManager {
 
 const CHAT_EVENT_TYPES: ChatEventType[] = ['message.created', 'note.created', 'conversation.updated', 'conversation.read']
 
+// Spec: "Invalid Conversation Rejection" — only these two error codes carry
+// conversation_id (server echo), so only these can be correlated to a pending subscribe.
+const REJECTION_ERRORS = new Set(['invalid_conversation_id', 'conversation_not_found'])
+
 function isTerminalCode(code: number): code is TerminalCloseCode {
   return code === CLOSE_UNAUTHORIZED || code === CLOSE_FORBIDDEN
 }
@@ -127,7 +131,12 @@ export function createConnectionManager(options: ConnectionManagerOptions): Conn
         return
       }
       if (parsed.type === 'error') {
-        options.onProtocolError?.(parsed as ProtocolErrorFrame)
+        const frame = parsed as ProtocolErrorFrame
+        // The id was never actually accepted server-side, regardless of local ref count.
+        if (frame.conversation_id && REJECTION_ERRORS.has(frame.error)) {
+          subscriptions.delete(frame.conversation_id)
+        }
+        options.onProtocolError?.(frame)
         return
       }
       if (!CHAT_EVENT_TYPES.includes(parsed.type as ChatEventType)) {

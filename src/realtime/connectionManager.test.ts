@@ -160,6 +160,37 @@ describe('createConnectionManager', () => {
     expect(events).toEqual([])
   })
 
+  it('removes a rejected conversation_id from subscriptions and never resends it after reconnect', () => {
+    const { manager, sockets, timers } = setup()
+    manager.connect()
+    sockets[0].onopen?.(undefined)
+    manager.subscribe('good')
+    manager.subscribe('bad')
+    expect(manager.getSubscriptions().sort()).toEqual(['bad', 'good'])
+
+    sockets[0].onmessage?.({
+      data: JSON.stringify({ type: 'error', error: 'conversation_not_found', conversation_id: 'bad' }),
+    })
+    expect(manager.getSubscriptions()).toEqual(['good'])
+
+    sockets[0].onclose?.({ code: 1006 })
+    timers.fire()
+    sockets[1].onopen?.(undefined)
+    expect(sockets[1].sent).toEqual([JSON.stringify({ type: 'subscribe', conversation_id: 'good' })])
+  })
+
+  it('ignores an error frame with no conversation_id to correlate (invalid_json, unknown_type, missing_conversation_id)', () => {
+    const { manager, sockets } = setup()
+    manager.connect()
+    sockets[0].onopen?.(undefined)
+    manager.subscribe('x')
+
+    expect(() =>
+      sockets[0].onmessage?.({ data: JSON.stringify({ type: 'error', error: 'missing_conversation_id' }) }),
+    ).not.toThrow()
+    expect(manager.getSubscriptions()).toEqual(['x'])
+  })
+
   it('invokes onProtocolError for an error frame instead of emitting a ChatEvent', () => {
     const protocolErrors: ProtocolErrorFrame[] = []
     const { manager, sockets } = setup({ onProtocolError: (frame) => protocolErrors.push(frame) })

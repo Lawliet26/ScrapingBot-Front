@@ -29,6 +29,8 @@ export type EventOf<T extends ChatEventType> = Extract<ChatEvent, { type: T }>
 export interface ProtocolErrorFrame {
   type: 'error'
   error: string
+  /** Echoed back only for invalid_conversation_id / conversation_not_found. */
+  conversation_id?: string
 }
 export type InboundFrame = ChatEvent | ProtocolErrorFrame
 export type OutboundFrame = { type: 'subscribe' | 'unsubscribe'; conversation_id: string }
