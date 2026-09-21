@@ -1,9 +1,9 @@
 import { ChatsCircle, MagnifyingGlass, WarningCircle } from '@phosphor-icons/react'
 import type { ConversationListItem as ConversationListItemType } from '@/api/types'
-import { EmptyState } from '@/components/ui/empty-state'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { InputField } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ConversationListItem } from './ConversationListItem'
 
 interface ConversationListProps {
@@ -31,27 +31,27 @@ export function ConversationList({
     ? [...conversations].sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime())
     : []
 
+  const unseenTotal = sorted.reduce((acc, c) => acc + c.unseen_messages_count, 0)
+
   return (
-    <div className="flex h-full w-full shrink-0 flex-col border-r border-border bg-surface lg:w-80">
-      <div className="border-b border-border p-3">
-        <div className="relative">
-          <MagnifyingGlass size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
-          <Input
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Buscar cliente..."
-            className="pl-9"
-          />
+    <div className="flex h-full w-full shrink-0 flex-col bg-canvas lg:w-[340px] lg:border-r lg:border-border/60">
+      <div className="space-y-4 px-4 pt-6 pb-4">
+        <div className="flex items-baseline justify-between px-1">
+          <h1 className="text-xl font-semibold tracking-tight text-ink">Conversaciones</h1>
+          {unseenTotal > 0 && <span className="text-[12px] font-medium text-accent-strong">{unseenTotal} sin leer</span>}
         </div>
+        <InputField
+          icon={MagnifyingGlass}
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Buscar cliente..."
+          aria-label="Buscar conversaciones"
+        />
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 space-y-1.5 overflow-y-auto px-3 pb-4">
         {isLoading ? (
-          <div className="space-y-3 p-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-16 w-full" />
-            ))}
-          </div>
+          Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-[92px] w-full" />)
         ) : isError ? (
           <EmptyState
             icon={WarningCircle}

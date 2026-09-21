@@ -1,11 +1,12 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
-const badgeVariants = cva('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium', {
+const badgeVariants = cva('inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium', {
   variants: {
     tone: {
       accent: 'bg-accent-soft text-accent-strong',
-      neutral: 'bg-canvas text-ink-muted border border-border-strong',
+      // Neutral: grabado en el canvas, sin borde.
+      neutral: 'bg-canvas text-ink-muted neu-inset-sm',
       success: 'bg-success-soft text-success',
       danger: 'bg-danger-soft text-danger',
     },
@@ -25,9 +26,10 @@ export function Badge({ className, tone, ...props }: BadgeProps) {
 export function StatusBadge({ label, color }: { label: string; color: string }) {
   return (
     <span
-      className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
-      style={{ backgroundColor: `${color}1a`, color }}
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium"
+      style={{ backgroundColor: `${color}22`, color }}
     >
+      <span className="size-1.5 rounded-full" style={{ backgroundColor: color }} aria-hidden />
       {label}
     </span>
   )
@@ -39,8 +41,8 @@ export function CounterBadge({ count, color, label }: { count: number; color: st
   return (
     <span
       aria-label={label}
-      className="inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none text-white"
-      style={{ backgroundColor: color }}
+      className="inline-flex min-w-[20px] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none text-white shadow-md"
+      style={{ backgroundColor: color, boxShadow: `0 4px 10px -2px ${color}88` }}
     >
       {count > 99 ? '99+' : count}
     </span>

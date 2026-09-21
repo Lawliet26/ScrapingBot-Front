@@ -1,14 +1,17 @@
-import { Image as ImageIcon, Plus, Spinner as SpinnerIcon, X } from '@phosphor-icons/react'
+import { Image as ImageIcon, Plus, WarningCircle, X } from '@phosphor-icons/react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { toast } from 'sonner'
 import { ApiError } from '@/api/client'
 import type { Product } from '@/api/types'
+import { Banner } from '@/components/ui/banner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { FieldError, Label } from '@/components/ui/label'
+import { FieldError, FieldHint, Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { ofertasLinesToPayload, ofertasToLines } from '@/lib/format'
+import { cn } from '@/lib/utils'
 import { useCreateProduct, useUpdateProduct } from './hooks'
 
 interface ProductFormDialogProps {
@@ -23,6 +26,23 @@ interface NewImage {
 }
 
 type FieldErrors = Record<string, string>
+
+/** Miniatura en relieve con botón de quitar que aparece al pasar el mouse. */
+function ImageTile({ src, onRemove }: { src: string; onRemove: () => void }) {
+  return (
+    <div className="group relative size-[72px] overflow-hidden rounded-xl neu-raised-sm">
+      <img src={src} alt="" className="size-full object-cover" />
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute inset-0 flex items-center justify-center bg-black/55 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+        aria-label="Quitar imagen"
+      >
+        <X size={18} weight="bold" />
+      </button>
+    </div>
+  )
+}
 
 export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDialogProps) {
   const isEditing = product !== null
@@ -121,12 +141,15 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {nonFieldError && (
-            <div className="rounded-lg bg-danger-soft px-3 py-2 text-[13px] text-danger">{nonFieldError}</div>
+            <Banner tone="danger">
+              <WarningCircle size={16} />
+              {nonFieldError}
+            </Banner>
           )}
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="nombre">Nombre</Label>
             <Input
               id="nombre"
@@ -139,7 +162,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
             <FieldError message={fieldErrors.nombre} />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="descripcion">Descripción</Label>
             <Textarea
               id="descripcion"
@@ -151,7 +174,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
             <FieldError message={fieldErrors.descripcion} />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="precio">Precio</Label>
             <Input
               id="precio"
@@ -165,7 +188,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
             <FieldError message={fieldErrors.precio} />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="ofertas">Ofertas</Label>
             <Textarea
               id="ofertas"
@@ -176,43 +199,30 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
               className="font-mono"
               aria-invalid={!!fieldErrors.ofertas}
             />
-            <p className="text-[13px] text-ink-faint">Una oferta por línea, formato cantidad=total.</p>
+            <FieldHint>Una oferta por línea, formato cantidad=total.</FieldHint>
             <FieldError message={fieldErrors.ofertas} />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label>Imágenes</Label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {existingImages.map((url) => (
-                <div key={url} className="group relative size-16 overflow-hidden rounded-lg border border-border">
-                  <img src={url} alt="" className="size-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeExistingImage(url)}
-                    className="absolute inset-0 flex items-center justify-center bg-ink/50 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
+                <ImageTile key={url} src={url} onRemove={() => removeExistingImage(url)} />
               ))}
               {newImages.map((img) => (
-                <div key={img.previewUrl} className="group relative size-16 overflow-hidden rounded-lg border border-border">
-                  <img src={img.previewUrl} alt="" className="size-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeNewImage(img.previewUrl)}
-                    className="absolute inset-0 flex items-center justify-center bg-ink/50 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
+                <ImageTile key={img.previewUrl} src={img.previewUrl} onRemove={() => removeNewImage(img.previewUrl)} />
               ))}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex size-16 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-border-strong text-ink-faint transition-colors hover:border-accent hover:text-accent"
+                className={cn(
+                  'flex size-[72px] flex-col items-center justify-center gap-0.5 rounded-xl bg-canvas text-ink-faint neu-inset',
+                  'transition-[color,box-shadow] hover:text-accent active:neu-pressed',
+                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent/60',
+                )}
+                aria-label="Agregar imágenes"
               >
-                <Plus size={16} />
+                <Plus size={16} weight="bold" />
                 <ImageIcon size={14} />
               </button>
               <input
@@ -232,7 +242,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
               Cancelar
             </Button>
             <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending && <SpinnerIcon className="animate-spin" size={16} />}
+              {mutation.isPending && <Spinner className="size-4 text-accent-ink" />}
               Guardar
             </Button>
           </DialogFooter>

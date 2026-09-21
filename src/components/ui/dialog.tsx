@@ -12,10 +12,10 @@ export function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content>) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-[2px] data-[state=open]:animate-in data-[state=open]:fade-in" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-[3px] data-[state=open]:animate-in" />
       <DialogPrimitive.Content
         className={cn(
-          'fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-surface p-6 shadow-2xl',
+          'fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-canvas p-7 neu-raised-lg',
           'data-[state=open]:animate-in',
           'max-h-[calc(100dvh-3rem)] overflow-y-auto',
           className,
@@ -23,7 +23,13 @@ export function DialogContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-ink-faint transition-colors hover:bg-canvas hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+        <DialogPrimitive.Close
+          className={cn(
+            'absolute right-4 top-4 flex size-8 items-center justify-center rounded-lg text-ink-faint transition-[box-shadow,color]',
+            'hover:text-ink hover:neu-raised-sm active:neu-pressed',
+            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent/60',
+          )}
+        >
           <X size={16} />
           <span className="sr-only">Cerrar</span>
         </DialogPrimitive.Close>
@@ -33,11 +39,11 @@ export function DialogContent({
 }
 
 export function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('mb-4 space-y-1', className)} {...props} />
+  return <div className={cn('mb-5 space-y-1 pr-8', className)} {...props} />
 }
 
 export function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title className={cn('text-lg font-semibold text-ink', className)} {...props} />
+  return <DialogPrimitive.Title className={cn('text-lg font-semibold tracking-tight text-ink', className)} {...props} />
 }
 
 export function DialogDescription({
@@ -48,5 +54,5 @@ export function DialogDescription({
 }
 
 export function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('mt-6 flex justify-end gap-2', className)} {...props} />
+  return <div className={cn('mt-6 flex justify-end gap-3', className)} {...props} />
 }

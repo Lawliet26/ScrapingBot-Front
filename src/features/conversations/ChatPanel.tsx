@@ -1,17 +1,20 @@
-import { ArrowLeft, WarningCircle } from '@phosphor-icons/react'
+import { ArrowLeft, ChatsCircle, Robot, WarningCircle } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ApiError } from '@/api/client'
 import type { ConversationDetailState, ConversationNote, Message } from '@/api/types'
 import { Avatar } from '@/components/ui/avatar'
 import { Banner } from '@/components/ui/banner'
+import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
+import { cn } from '@/lib/utils'
 import { Composer } from './Composer'
 import { MessageBubble } from './MessageBubble'
 import { NotesDialog } from './NotesDialog'
 import { NotesPanel } from './NotesPanel'
+import { useNotesPanel } from './useNotesPanel'
 import { mergeById } from './mergeById'
 import { useConversationDetailQuery, useConversationPoll, useMarkRead, useSendMessage, useToggleBot } from './hooks'
 import type { SendMessagePayload } from '@/api/conversations'
@@ -39,6 +42,7 @@ export function ChatPanel({ conversationId, customerName, phone, onBack }: ChatP
   const toggleBot = useToggleBot(conversationId)
   const markRead = useMarkRead(conversationId)
   const sendMessage = useSendMessage(conversationId)
+  const notesPanel = useNotesPanel(notes.length)
 
   useEffect(() => {
     if (!detailQuery.data) return
@@ -134,33 +138,34 @@ export function ChatPanel({ conversationId, customerName, phone, onBack }: ChatP
   return (
     <div className="flex h-full flex-1">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex size-8 items-center justify-center rounded-md text-ink-faint hover:bg-canvas hover:text-ink lg:hidden"
-          >
+        <div className="flex h-[72px] shrink-0 items-center gap-3 border-b border-border/60 bg-canvas px-4 lg:px-6">
+          <Button variant="ghost" size="icon" onClick={onBack} className="lg:hidden" aria-label="Volver a la lista">
             <ArrowLeft size={18} />
-          </button>
-          <Avatar name={customerName} />
+          </Button>
+          <Avatar name={customerName} className="size-10" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-ink">{customerName}</p>
+            <p className="truncate text-[15px] font-semibold tracking-tight text-ink">{customerName}</p>
             <p className="truncate text-[12px] text-ink-faint">{phone}</p>
           </div>
-          <NotesDialog notes={notes} />
+          <NotesDialog notes={notes} panelOpen={notesPanel.open} onTogglePanel={notesPanel.toggle} />
 
-          <div className="flex items-center gap-2">
-            <span className="text-[13px] font-medium text-ink-muted">Bot {convState.llm_enabled ? 'ON' : 'OFF'}</span>
+          {/* Estado del bot: píldora hundida con el switch adentro */}
+          <label className="flex cursor-pointer items-center gap-2.5 rounded-full bg-canvas py-1.5 pl-3.5 pr-1.5 neu-inset">
+            <Robot size={16} className={cn(convState.llm_enabled ? 'text-success' : 'text-ink-faint')} />
+            <span className="hidden text-[12.5px] font-medium text-ink-muted sm:inline">
+              Bot {convState.llm_enabled ? 'activo' : 'apagado'}
+            </span>
             <Switch
               checked={convState.llm_enabled}
               onCheckedChange={() => void handleToggleBot()}
               disabled={toggleBot.isPending}
+              aria-label="Activar o apagar el bot"
             />
-          </div>
+          </label>
         </div>
 
         {idleWarning && (
-          <div className="px-4 pt-3">
+          <div className="px-4 pt-4 lg:px-6">
             <Banner tone="warning">
               <WarningCircle size={16} />
               Sin actividad del cliente hace más de 24 horas.
@@ -168,13 +173,18 @@ export function ChatPanel({ conversationId, customerName, phone, onBack }: ChatP
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4 lg:px-6">
           {messages.length === 0 ? (
-            <EmptyState icon={WarningCircle} title="Sin mensajes en esta conversación." />
+            <EmptyState icon={ChatsCircle} title="Sin mensajes en esta conversación." />
           ) : (
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
+            <div className="mx-auto max-w-3xl">
+              {messages.map((message, index) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  isFirstOfGroup={index === 0 || messages[index - 1].direction !== message.direction}
+                  isLastOfGroup={index === messages.length - 1 || messages[index + 1].direction !== message.direction}
+                />
               ))}
               <div ref={messagesEndRef} />
             </div>
@@ -190,7 +200,7 @@ export function ChatPanel({ conversationId, customerName, phone, onBack }: ChatP
         />
       </div>
 
-      <NotesPanel notes={notes} />
+      <NotesPanel notes={notes} open={notesPanel.open} onClose={() => notesPanel.setOpen(false)} />
     </div>
   )
 }

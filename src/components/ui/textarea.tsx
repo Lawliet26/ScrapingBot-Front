@@ -5,10 +5,10 @@ export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTex
   return (
     <textarea
       className={cn(
-        'flex w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
-        'aria-invalid:border-danger aria-invalid:focus-visible:ring-danger',
+        'flex w-full rounded-xl bg-canvas px-4 py-3 text-sm leading-relaxed text-ink neu-inset placeholder:text-ink-faint',
+        'transition-[outline-color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent/60',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        'aria-invalid:outline-2 aria-invalid:outline-offset-2 aria-invalid:outline-danger/60',
         className,
       )}
       {...props}

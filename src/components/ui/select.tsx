@@ -9,8 +9,8 @@ export function SelectTrigger({ className, children, ...props }: React.Component
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        'flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-border-strong bg-surface px-3 text-sm text-ink',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent',
+        'flex h-11 w-full items-center justify-between gap-2 rounded-xl bg-canvas px-4 text-sm text-ink neu-inset',
+        'transition-[outline-color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent/60',
         'disabled:opacity-50',
         className,
       )}
@@ -29,15 +29,15 @@ export function SelectContent({ className, children, ...props }: React.Component
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         className={cn(
-          'z-50 overflow-hidden rounded-lg border border-border bg-surface shadow-xl',
+          'z-50 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl bg-canvas neu-raised-lg',
           'data-[state=open]:animate-in',
           className,
         )}
         position="popper"
-        sideOffset={4}
+        sideOffset={8}
         {...props}
       >
-        <SelectPrimitive.Viewport className="p-1">{children}</SelectPrimitive.Viewport>
+        <SelectPrimitive.Viewport className="p-1.5">{children}</SelectPrimitive.Viewport>
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
   )
@@ -47,15 +47,16 @@ export function SelectItem({ className, children, ...props }: React.ComponentPro
   return (
     <SelectPrimitive.Item
       className={cn(
-        'relative flex cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-3 text-sm text-ink outline-none',
+        'relative flex cursor-pointer select-none items-center rounded-lg py-2 pl-8 pr-3 text-sm text-ink outline-none transition-colors',
         'data-[highlighted]:bg-accent-soft data-[highlighted]:text-accent-strong',
+        'data-[state=checked]:font-medium',
         className,
       )}
       {...props}
     >
       <span className="absolute left-2.5 inline-flex size-4 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <Check size={14} />
+          <Check size={14} weight="bold" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

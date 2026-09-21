@@ -16,10 +16,14 @@ function initialsForName(name: string): string {
 }
 
 export function Avatar({ name, className }: { name: string; className?: string }) {
+  const color = colorForName(name)
   return (
     <div
       className={cn('flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white', className)}
-      style={{ backgroundColor: colorForName(name) }}
+      style={{
+        background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+        boxShadow: `3px 3px 7px var(--neu-dark), -3px -3px 7px var(--neu-light), inset 0 1px 0 rgba(255,255,255,0.25)`,
+      }}
     >
       {initialsForName(name)}
     </div>

@@ -1,7 +1,9 @@
+import { Eye } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { AgentVisibleField } from '@/api/types'
 import { Button } from '@/components/ui/button'
+import { Card, CardDescription, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
@@ -36,33 +38,44 @@ export function VisibilityConfigCard() {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <h2 className="text-sm font-semibold text-ink">Campos visibles para el agente</h2>
-      <p className="mt-0.5 text-[13px] text-ink-muted">
-        El agente de IA solo puede mencionar los campos marcados aquí.
-      </p>
-
-      {configQuery.isLoading ? (
-        <div className="mt-3 space-y-2">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-5 w-32" />
+    <Card className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex items-start gap-4">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-canvas text-accent neu-inset">
+          <Eye size={20} />
         </div>
-      ) : (
-        <div className="mt-3 flex flex-wrap gap-4">
-          {FIELDS.map(({ key, label }) => (
-            <label key={key} className="flex cursor-pointer items-center gap-2 text-[13.5px] text-ink">
-              <Checkbox checked={selected.includes(key)} onCheckedChange={(checked) => toggle(key, checked === true)} />
-              {label}
-            </label>
-          ))}
-        </div>
-      )}
+        <div>
+          <CardTitle>Campos visibles para el agente</CardTitle>
+          <CardDescription>El agente de IA solo puede mencionar los campos marcados aquí.</CardDescription>
 
-      <Button size="sm" className="mt-4" onClick={() => void handleSave()} disabled={updateConfig.isPending || configQuery.isLoading}>
-        {updateConfig.isPending && <Spinner className="size-4 text-accent-ink" />}
+          {configQuery.isLoading ? (
+            <div className="mt-4 flex gap-4">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-5 w-28" />
+              <Skeleton className="h-5 w-20" />
+            </div>
+          ) : (
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
+              {FIELDS.map(({ key, label }) => (
+                <label key={key} className="flex cursor-pointer items-center gap-2.5 text-[13.5px] text-ink">
+                  <Checkbox checked={selected.includes(key)} onCheckedChange={(checked) => toggle(key, checked === true)} />
+                  {label}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Button
+        variant="secondary"
+        size="sm"
+        className="shrink-0 self-start md:self-center"
+        onClick={() => void handleSave()}
+        disabled={updateConfig.isPending || configQuery.isLoading}
+      >
+        {updateConfig.isPending && <Spinner className="size-4" />}
         Guardar visibilidad
       </Button>
-    </div>
+    </Card>
   )
 }

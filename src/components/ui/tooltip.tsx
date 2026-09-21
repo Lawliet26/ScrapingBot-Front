@@ -11,7 +11,7 @@ export function TooltipContent({ className, sideOffset = 8, ...props }: React.Co
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
         className={cn(
-          'z-50 rounded-md bg-ink px-2.5 py-1.5 text-[12px] font-medium text-canvas shadow-lg',
+          'z-50 rounded-lg bg-ink px-2.5 py-1.5 text-[12px] font-medium text-canvas shadow-lg',
           'data-[state=delayed-open]:animate-in',
           className,
         )}

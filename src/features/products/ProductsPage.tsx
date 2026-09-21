@@ -3,7 +3,8 @@ import { useState } from 'react'
 import type { Product } from '@/api/types'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
-import { Input } from '@/components/ui/input'
+import { InputField } from '@/components/ui/input'
+import { PageHeader } from '@/components/ui/page-header'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDebouncedValue } from '@/lib/useDebouncedValue'
 import { ProductDeleteDialog } from './ProductDeleteDialog'
@@ -27,39 +28,39 @@ export function ProductsPage() {
   const totalPages = productsQuery.data ? Math.max(1, Math.ceil(productsQuery.data.count / PAGE_SIZE)) : 1
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-ink">Productos</h1>
-          <p className="text-sm text-ink-muted">Catálogo que el bot puede ofrecer a tus clientes.</p>
-        </div>
-        <Button onClick={() => setEditingProduct(null)}>
-          <Plus size={16} weight="bold" />
-          Nuevo producto
-        </Button>
-      </div>
+    <div className="mx-auto max-w-6xl px-6 py-10">
+      <PageHeader
+        title="Productos"
+        description="Catálogo que el bot puede ofrecer a tus clientes."
+        actions={
+          <Button onClick={() => setEditingProduct(null)}>
+            <Plus size={16} weight="bold" />
+            Nuevo producto
+          </Button>
+        }
+      />
 
-      <div className="mb-6">
+      <div className="mb-8">
         <VisibilityConfigCard />
       </div>
 
-      <div className="mb-4 relative max-w-sm">
-        <MagnifyingGlass size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
-        <Input
+      <div className="mb-5 max-w-sm">
+        <InputField
+          icon={MagnifyingGlass}
           value={searchInput}
           onChange={(e) => {
             setSearchInput(e.target.value)
             setPage(1)
           }}
           placeholder="Buscar por nombre..."
-          className="pl-9"
+          aria-label="Buscar productos"
         />
       </div>
 
       {productsQuery.isLoading ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-14 w-full rounded-xl" />
+            <Skeleton key={i} className="h-16 w-full" />
           ))}
         </div>
       ) : productsQuery.isError ? (
@@ -90,16 +91,17 @@ export function ProductsPage() {
             />
 
             {totalPages > 1 && (
-              <div className="mt-4 flex items-center justify-between text-[13px] text-ink-muted">
+              <div className="mt-6 flex items-center justify-between text-[13px] text-ink-muted">
                 <span>
                   Página {page} de {totalPages} · {productsQuery.data.count} productos
                 </span>
-                <div className="flex gap-1">
+                <div className="flex gap-2">
                   <Button
                     variant="secondary"
                     size="icon"
                     disabled={page <= 1}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    aria-label="Página anterior"
                   >
                     <CaretLeft size={16} />
                   </Button>
@@ -108,6 +110,7 @@ export function ProductsPage() {
                     size="icon"
                     disabled={page >= totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    aria-label="Página siguiente"
                   >
                     <CaretRight size={16} />
                   </Button>

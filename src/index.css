@@ -20,6 +20,8 @@
   --color-danger-soft: var(--danger-soft);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
 
   --animate-in: fade-in 0.15s ease-out;
 
@@ -35,50 +37,40 @@
   }
 }
 
+/*
+ * Neumorfismo: los elementos se "extruyen" del canvas con dos sombras
+ * (una clara y una oscura). Por eso el canvas nunca es blanco puro ni negro
+ * puro: necesita margen hacia ambos lados para que las dos luces se lean.
+ */
 :root {
-  --canvas: #f4f5f7;
+  --canvas: #e9ecf1;
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --border: #e2e4e9;
-  --border-strong: #cbcfd8;
+  --border: #dde1e8;
+  --border-strong: #c6cbd5;
   --ink: #14161c;
   --ink-muted: #5c6270;
   --ink-faint: #9aa0ad;
   --accent: #2a5ee8;
   --accent-strong: #1c46b8;
-  --accent-soft: #e8eefd;
+  --accent-soft: #dbe4fb;
   --accent-ink: #ffffff;
+  --accent-glow: rgba(42, 94, 232, 0.35);
   --danger: #d6314a;
   --danger-soft: #fbe7ea;
   --success: #1f9d55;
   --success-soft: #e5f6ea;
+  --warning: #9a6412;
+  --warning-soft: #fdf3e1;
+  --neu-light: #ffffff;
+  --neu-dark: #c2c7d1;
   color-scheme: light;
 }
 
-:root[data-theme='standard'] {
-  --canvas: #0d0e12;
-  --surface: #16181f;
-  --surface-raised: #1c1f28;
-  --border: #262a35;
-  --border-strong: #363b48;
-  --ink: #f1f2f5;
-  --ink-muted: #a2a8b5;
-  --ink-faint: #666d7c;
-  --accent: #5b8bf5;
-  --accent-strong: #7ea3f7;
-  --accent-soft: #1a2540;
-  --accent-ink: #06122e;
-  --danger: #f0546b;
-  --danger-soft: #3a1620;
-  --success: #3bc274;
-  --success-soft: #123420;
-  color-scheme: dark;
-}
-
 :root[data-theme='dark'] {
-  --canvas: #0b0b0d;
-  --surface: #17171a;
-  --surface-raised: #1e1e22;
+  --canvas: #101012;
+  --surface: #18181b;
+  --surface-raised: #1f1f23;
   --border: #2a2a2f;
   --border-strong: #3a3a41;
   --ink: #f4f3f1;
@@ -88,11 +80,77 @@
   --accent-strong: #6ee7b7;
   --accent-soft: #113328;
   --accent-ink: #052e1f;
+  --accent-glow: rgba(52, 211, 153, 0.35);
   --danger: #f0546b;
   --danger-soft: #3a1620;
   --success: #22c1a6;
   --success-soft: #0f2f2a;
+  --warning: #f2b955;
+  --warning-soft: #33270f;
+  --neu-light: rgba(255, 255, 255, 0.045);
+  --neu-dark: rgba(0, 0, 0, 0.65);
   color-scheme: dark;
+}
+
+/*
+ * Utilidades neumórficas. Se definen con @utility (y no con --shadow-* en
+ * @theme) para que acepten variantes (hover:, active:, focus-within:) y para
+ * que el ring de Tailwind no las pise: el foco se hace con outline.
+ */
+@utility neu-raised-sm {
+  box-shadow:
+    3px 3px 7px var(--neu-dark),
+    -3px -3px 7px var(--neu-light);
+}
+
+@utility neu-raised {
+  box-shadow:
+    6px 6px 14px var(--neu-dark),
+    -6px -6px 14px var(--neu-light);
+}
+
+@utility neu-raised-lg {
+  box-shadow:
+    18px 18px 44px var(--neu-dark),
+    -12px -12px 36px var(--neu-light);
+}
+
+@utility neu-inset-sm {
+  box-shadow:
+    inset 2px 2px 5px var(--neu-dark),
+    inset -2px -2px 5px var(--neu-light);
+}
+
+@utility neu-inset {
+  box-shadow:
+    inset 4px 4px 10px var(--neu-dark),
+    inset -4px -4px 10px var(--neu-light);
+}
+
+@utility neu-pressed {
+  box-shadow:
+    inset 3px 3px 6px var(--neu-dark),
+    inset -2px -2px 5px var(--neu-light);
+}
+
+@utility neu-none {
+  box-shadow: none;
+}
+
+/* Botón de acento: relieve + halo del color de marca. */
+@utility neu-accent {
+  box-shadow:
+    6px 6px 14px var(--neu-dark),
+    -6px -6px 14px var(--neu-light),
+    0 10px 28px -8px var(--accent-glow);
+}
+
+/* Estado presionado sobre una superficie de color (acento, danger): las
+ * luces se calculan sobre el propio botón, no sobre el canvas. */
+@utility neu-accent-pressed {
+  box-shadow:
+    inset 3px 3px 8px rgba(0, 0, 0, 0.35),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.18);
 }
 
 * {
