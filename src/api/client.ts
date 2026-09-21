@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie'
+import { MOCK_API, mockRequest } from '@/mocks'
 
 export class ApiError extends Error {
   status: number
@@ -52,6 +53,15 @@ const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const method = options.method ?? 'GET'
+
+  // Único punto de intercepción del mock: mismo contrato de éxito/error que el backend real.
+  if (MOCK_API) {
+    const res = await mockRequest(method, path, options.body)
+    if (res.status === 204) return undefined as T
+    if (res.status >= 400) throw new ApiError(res.status, res.errors ?? [], res.detail)
+    return res.body as T
+  }
+
   const headers: Record<string, string> = {}
 
   if (MUTATING_METHODS.has(method)) {

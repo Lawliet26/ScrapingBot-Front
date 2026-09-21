@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react'
 import { fetchCsrf, fetchMe, login as loginRequest, logout as logoutRequest, type MeResponse } from '@/api/auth'
 import type { User } from '@/api/types'
+import { AUTH_BYPASS } from './bypass'
 
 type AuthStatus = 'loading' | 'authenticated' | 'anonymous'
 
@@ -13,12 +14,19 @@ interface AuthContextValue {
   logout: () => Promise<void>
 }
 
+/** Sesión ficticia de staff que se inyecta cuando el bypass está activo. */
+const BYPASS_SESSION: MeResponse = {
+  user: { id: 0, username: 'dev' },
+  is_staff: true,
+}
+
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
 
   useEffect(() => {
+    if (AUTH_BYPASS) return
     fetchCsrf().catch(() => {
       // Sin conexión al backend todavía; el login mostrará el error real al intentar.
     })
@@ -29,6 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: fetchMe,
     retry: false,
     staleTime: Infinity,
+    enabled: !AUTH_BYPASS,
+    initialData: AUTH_BYPASS ? BYPASS_SESSION : undefined,
   })
 
   const value = useMemo<AuthContextValue>(() => {
@@ -39,11 +49,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: meQuery.data?.user ?? null,
       isStaff: meQuery.data?.is_staff ?? false,
       login: async (username: string, password: string) => {
+        if (AUTH_BYPASS) return
         await fetchCsrf()
         const result = await loginRequest(username, password)
         queryClient.setQueryData<MeResponse>(['auth', 'me'], result)
       },
       logout: async () => {
+        if (AUTH_BYPASS) return
         await logoutRequest()
         queryClient.setQueryData(['auth', 'me'], null)
         queryClient.clear()

@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState, type R
 import { toast } from 'sonner'
 import { useAuth } from '@/auth/AuthProvider'
 import { CLOSE_UNAUTHORIZED, resolveWsUrl, type ChatEvent, type ChatEventType, type EventOf } from '@/api/ws'
+import { MOCK_API } from '@/mocks'
 import { createConnectionManager, type ConnectionManager, type ConnectionStatus } from './connectionManager'
 
 interface WebSocketContextValue {
@@ -23,6 +24,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!(authStatus === 'authenticated' && isStaff)) return
+    // Sin backend no hay socket: el mock alimenta el chat por polling.
+    if (MOCK_API) return
 
     const manager = createConnectionManager({ url: resolveWsUrl })
     managerRef.current = manager
